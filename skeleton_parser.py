@@ -214,7 +214,7 @@ def parseJson(json_file):
                         Bidder_Amount = escapeStrings(transformDollar(bids['Amount']))
                    
                     #bid
-                        bid_row = Bidder_Time + columnSeparator + Bidder_Amount + columnSeparator + Item_ID + columnSeparator + Bidder_UserID + '\n'
+                        bid_row = Bidder_Time + columnSeparator + Bidder_Amount + columnSeparator + Item_ID + columnSeparator + Bidder_UserID + columnSeparator + Category +'\n'
                         bidFile.write(bid_row)
                     #bidder
                         bidder_row = Bidder_Country + columnSeparator + Bidder_UserID +  columnSeparator + Bidder_Rating + columnSeparator + Bidder_Location + '\n' 
