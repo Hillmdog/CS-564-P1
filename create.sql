@@ -8,14 +8,15 @@ create table Item(
     Name TEXT,
     Category TEXT, 
     Description TEXT,
-    Item_ID INTEGER PRIMARY KEY
+    Item_ID INTEGER,
+    PRIMARY KEY (Item_ID, Category)
 );
 
 create table Seller(
     User_ID TEXT PRIMARY KEY,
     Rating INTEGER,
-    Location TEXT NOT NULL,
-    Country TEXT NOT NULL
+    Location TEXT,
+    Country TEXT
 );
 
 create table Bidder(

@@ -1,5 +1,5 @@
 #!/bin/bash
-python skeleton_parser0.py ebay_data/items-*.json
+python skeleton_parser.py ebay_data/items-*.json
 #python3 skeleton_parser.py ebay_data/ebay_data/items-*.json
 
 # lets remove some duplicats, one file at a time

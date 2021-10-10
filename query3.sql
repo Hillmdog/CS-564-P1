@@ -1,3 +1,4 @@
-SELECT COUNT(Start, End, Seller_ID, Item_ID)
+SELECT COUNT(Category)
 FROM Auction
-WHERE Category LIKE '%,%,%,%,';
+    LEFT JOIN Item On Auction.Item_ID = Item.Item_ID
+WHERE Category LIKE '.%, %, %, %.';
