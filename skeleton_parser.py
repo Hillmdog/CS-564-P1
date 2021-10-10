@@ -80,7 +80,7 @@ def openFiles():
     auctionFile = open('auction.dot', 'w')
     itemFile = open('item.dot', 'w')
     bidFile = open('bid.dot', 'w')
-    bidderFile = open('Bidder.dot', 'w')
+    bidderFile = open('bidder.dot', 'w')
     
 def closeFiles():
     global sellerFile, auctionFile, itemFile, bidFile, bidderFile
@@ -215,9 +215,6 @@ def parseJson(json_file):
                 #bidder
                     bidder_row = Bidder_Country + columnSeparator + Bidder_UserID +  columnSeparator + Bidder_Rating + columnSeparator + Bidder_Location + '\n' 
                     bidderFile.write(bidder_row)
-                
-            
-            
             
         #Seller
 
@@ -231,109 +228,6 @@ def parseJson(json_file):
         #item  
             item_row = Name + columnSeparator + Category + columnSeparator + Description + columnSeparator + Item_ID + '\n'
             itemFile.write(item_row)
-        
-        
-        
-                #print(key, '\n', item[key], '\n')
-                
-            
-            
-           
-def test_individual(json_file):
-    with open(json_file, 'r') as f:
-        items = loads(f.read())['Items'] # creates a Python dictionary of Items for the supplied json file
-        item_attributes = []
-        item = items[8]
-        buy_price_flag = 0
-        print(item, '\n\n')
-        for key in item:
-            # nail the only optional attribute 
-            if 'Buy_Price' in item:
-                buy_price_flag = 1
-            else:
-                buy_price_flag = 0
-            # first up let's snag all these attributes
-            #start with the embedded ones
-            if key == 'Bids':
-                # if bids is 'None'
-                if item['Bids']is not None:
-                   for i,index in enumerate(item['Bids']):
-                       individualBidder = []
-                       for attr in list(index.values()):
-                           bEmbededAtr = attr['Bidder']
-                           for bidder in bEmbededAtr:
-                               #get this junk
-                               individualBidder.append((bidder, bEmbededAtr[bidder]))
-                           
-                           if 'Country' not in bEmbededAtr.keys():
-                               individualBidder.append(('Country', 'None'))
-                           if 'Location' not in bEmbededAtr.keys():
-                               individualBidder.append(('Location', 'None'))
-                               
-                           
-                           individualBidder.append(('Time', attr['Time']))
-                           individualBidder.append(('Amount', attr['Amount']))
-                       item_attributes.append(('bids' + str(i), individualBidder))
-                else:
-                    item_attributes.append(('bids', 'None'))
-                    pass
-            #next embedded one
-            elif key == 'Seller':
-                seller = item['Seller']
-                
-                item_attributes.append(('Seller UserID', seller['UserID'] ))
-                item_attributes.append(('Seller Rating', seller['Rating']))
-
-            else:
-                #rest of them attributes man
-                item_attributes.append((key, item[key]))
-            if buy_price_flag == 0:
-                item_attributes.append(('Buy_Price', 'None'))
-                    
-         # add them to their respective files and repeat
-        item_attributes = dict(item_attributes)
-        for key in item_attributes:
-            print(key, '\n', item_attributes[key], '\n')
-        #Seller
-        
-        with open('seller.dot', 'w') as  seller:
-            #gather attributes for seller
-            User_ID = item_attributes['Seller UserID']
-            Rating = item_attributes['Seller Rating']
-            Location = item_attributes['Location']
-            Country = item_attributes['Country']
-            Seller_Row = User_ID + '|' + Rating + '|' + Location + '|' + Country
-            seller.write(Seller_Row)
-        
-        with open('auction.dot', 'w') as auction:
-            Start = transformDttm(item_attributes['Started'])
-            End = transformDttm(item_attributes['Ends'])
-            First_bid = transformDollar(item_attributes['First_Bid'])
-            Currently = transformDollar(item_attributes['Currently'])
-            Number_of_Bids = item_attributes['Number_of_Bids']
-            Buy_Price = item_attributes['Buy_Price']
-            if Buy_Price != 'None':
-                Buy_Price = transformDollar(Buy_Price)
-            User_ID = item_attributes['Seller UserID']
-            Item_ID = item_attributes['ItemID']
-            Auction_row = Start + '|' + End + '|' + First_bid + '|' + Currently + '|' + Number_of_Bids + '|' + Buy_Price + '|' + User_ID + '|' + Item_ID
-            auction.write(Auction_row)         
-        
-        with open('item.dot', 'w') as item:
-            Name = item_attributes['Name']
-            Category = ''
-            for cats in item_attributes['Category']:
-                Category = Category + cats  + ', ' 
-            Category = Category[:-1 -1]
-            Description = item_attributes['Description']
-            Item_ID = item_attributes['ItemID']
-            item_row = Name + columnSeparator + Category + columnSeparator + Description + columnSeparator + Item_ID
-            item.write(item_row)
-                      
-                
-                
-            
-        
 
 """
 Loops through each json files provided on the command line and passes each file
