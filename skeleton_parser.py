@@ -80,7 +80,7 @@ def openFiles():
     auctionFile = open('auction.dot', 'w')
     itemFile = open('item.dot', 'w')
     bidFile = open('bid.dot', 'w')
-    bidderFile = open('bidder.dot', 'w')
+    bidderFile = open('Bidder.dot', 'w')
     
 def closeFiles():
     global sellerFile, auctionFile, itemFile, bidFile, bidderFile
@@ -90,16 +90,15 @@ def closeFiles():
     bidFile.close()
     bidderFile.close()
     
-def escapeStrings(string, outsideQuotes = True):
+def escapeStrings(string):
     new_string = ''
     for char in string:
         if char == '"':
             char = char + '"'
         new_string = new_string + char
-    if outsideQuotes:
-        string = '"' + new_string + '"'
-    else:
-        string = new_string
+    
+    string = '"' + new_string + '"'
+    
     return string
 """
 Parses a single json file. Currently, there's a loop that iterates over each
@@ -183,16 +182,18 @@ def parseJson(json_file):
             
             Item_ID = item_attributes['ItemID']
             Name = escapeStrings(item_attributes['Name'])
-            
-            Category = '"' 
-            for cats in item_attributes['Category']:
-                Category = Category + escapeStrings(cats, outsideQuotes = False)  + ', ' 
-            Category = Category[:-1 -1] + '"'
+                
            
             if item_attributes['Description'] is not None:
                 Description = escapeStrings(item_attributes['Description'])
             else:
                 Description = '"None"'
+                
+            for cats in item_attributes['Category']:
+                Category = escapeStrings(cats)
+            #item  
+                item_row = Name + columnSeparator + Category + columnSeparator + Description + columnSeparator + Item_ID + '\n'
+                itemFile.write(item_row)
             
             Bidder_UserID = None
             Bidder_Rating = None
@@ -215,6 +216,9 @@ def parseJson(json_file):
                 #bidder
                     bidder_row = Bidder_Country + columnSeparator + Bidder_UserID +  columnSeparator + Bidder_Rating + columnSeparator + Bidder_Location + '\n' 
                     bidderFile.write(bidder_row)
+                
+            
+            
             
         #Seller
 
@@ -225,9 +229,8 @@ def parseJson(json_file):
             Auction_row = Start + columnSeparator + End + columnSeparator + First_bid + columnSeparator + Currently + columnSeparator + Number_of_Bids + columnSeparator + Buy_Price + columnSeparator + Seller_User_ID + columnSeparator + Item_ID + '\n'
             auctionFile.write(Auction_row)         
        
-        #item  
-            item_row = Name + columnSeparator + Category + columnSeparator + Description + columnSeparator + Item_ID + '\n'
-            itemFile.write(item_row)
+        
+        
 
 """
 Loops through each json files provided on the command line and passes each file
