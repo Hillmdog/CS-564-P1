@@ -80,7 +80,7 @@ def openFiles():
     auctionFile = open('auction.dot', 'w')
     itemFile = open('item.dot', 'w')
     bidFile = open('bid.dot', 'w')
-    bidderFile = open('Bidder.dot', 'w')
+    bidderFile = open('bidder.dot', 'w')
     
 def closeFiles():
     global sellerFile, auctionFile, itemFile, bidFile, bidderFile
@@ -90,6 +90,17 @@ def closeFiles():
     bidFile.close()
     bidderFile.close()
     
+def escapeStrings(string, outsideQuotes = True):
+    new_string = ''
+    for char in string:
+        if char == '"':
+            char = char + '"'
+        new_string = new_string + char
+    if outsideQuotes:
+        string = '"' + new_string + '"'
+    else:
+        string = new_string
+    return string
 """
 Parses a single json file. Currently, there's a loop that iterates over each
 item in the data set. Your job is to extend this functionality to create all
@@ -154,32 +165,34 @@ def parseJson(json_file):
             item_attributes = dict(item_attributes)
        
         
-            Seller_User_ID = item_attributes['Seller UserID']
+            Seller_User_ID = escapeStrings(item_attributes['Seller UserID'])
             Seller_Rating = item_attributes['Seller Rating']
-            Location = item_attributes['Location']
-            Country = item_attributes['Country']
-            Start = transformDttm(item_attributes['Started'])
-            End = transformDttm(item_attributes['Ends'])
-            First_bid = transformDollar(item_attributes['First_Bid'])
-            Currently = transformDollar(item_attributes['Currently'])
+            Location = escapeStrings(item_attributes['Location'])
+            Country = escapeStrings(item_attributes['Country'])
+            Start = escapeStrings(transformDttm(item_attributes['Started']))
+            End = escapeStrings(transformDttm(item_attributes['Ends']))
+            First_bid = escapeStrings(transformDollar(item_attributes['First_Bid']))
+            Currently = escapeStrings(transformDollar(item_attributes['Currently']))
             Number_of_Bids = item_attributes['Number_of_Bids']
             
             Buy_Price = item_attributes['Buy_Price']
             if Buy_Price != 'None':
-                Buy_Price = transformDollar(Buy_Price)
+                Buy_Price = escapeStrings(transformDollar(Buy_Price))
+            else:
+                Buy_Price = escapeStrings(Buy_Price)                
             
             Item_ID = item_attributes['ItemID']
-            Name = item_attributes['Name']
+            Name = escapeStrings(item_attributes['Name'])
             
-            Category = ''
+            Category = '"' 
             for cats in item_attributes['Category']:
-                Category = Category + cats  + ', ' 
-            Category = Category[:-1 -1]
+                Category = Category + escapeStrings(cats, outsideQuotes = False)  + ', ' 
+            Category = Category[:-1 -1] + '"'
            
             if item_attributes['Description'] is not None:
-                Description = item_attributes['Description']
+                Description = escapeStrings(item_attributes['Description'])
             else:
-                Description = 'None'
+                Description = '"None"'
             
             Bidder_UserID = None
             Bidder_Rating = None
@@ -189,28 +202,19 @@ def parseJson(json_file):
             Bidder_Amount = None
             for bids in item_attr_bids:
                 if 'None' not in bids:
-                    Bidder_UserID = bids['UserID']
-                    Bidder_Rating = bids['Rating']
-                    Bidder_Location = bids['Location']
-                    Bidder_Country = bids['Country']
-                    Bidder_Time = transformDttm(bids['Time'])
-                    Bidder_Amount = transformDollar(bids['Amount'])
-                else:
-                    Bidder_UserID = 'None'
-                    Bidder_Rating = 'None'
-                    Bidder_Location = 'None'
-                    Bidder_Country = 'None'
-                    Bidder_Time = 'None'
-                    Bidder_Amount = 'None'
-            #bid
-                bid_row = Bidder_Time + columnSeparator + Bidder_Amount + columnSeparator + Item_ID + columnSeparator + Bidder_UserID + '\n'
-                bidFile.write(bid_row)
-            #bidder
-                bidder_row = Bidder_Country + columnSeparator + Bidder_UserID +  columnSeparator + Bidder_Rating + columnSeparator + Bidder_Location + '\n' 
-                bidderFile.write(bidder_row)
-                
-            
-            
+                    Bidder_UserID = escapeStrings(bids['UserID'])
+                    Bidder_Rating = bids['Rating'] 
+                    Bidder_Location = escapeStrings(bids['Location'])
+                    Bidder_Country = escapeStrings(bids['Country'])
+                    Bidder_Time = escapeStrings(transformDttm(bids['Time']))
+                    Bidder_Amount = escapeStrings(transformDollar(bids['Amount']))
+               
+                #bid
+                    bid_row = Bidder_Time + columnSeparator + Bidder_Amount + columnSeparator + Item_ID + columnSeparator + Bidder_UserID + '\n'
+                    bidFile.write(bid_row)
+                #bidder
+                    bidder_row = Bidder_Country + columnSeparator + Bidder_UserID +  columnSeparator + Bidder_Rating + columnSeparator + Bidder_Location + '\n' 
+                    bidderFile.write(bidder_row)
             
         #Seller
 
@@ -224,109 +228,6 @@ def parseJson(json_file):
         #item  
             item_row = Name + columnSeparator + Category + columnSeparator + Description + columnSeparator + Item_ID + '\n'
             itemFile.write(item_row)
-        
-        
-        
-                #print(key, '\n', item[key], '\n')
-                
-            
-            
-           
-def test_individual(json_file):
-    with open(json_file, 'r') as f:
-        items = loads(f.read())['Items'] # creates a Python dictionary of Items for the supplied json file
-        item_attributes = []
-        item = items[8]
-        buy_price_flag = 0
-        print(item, '\n\n')
-        for key in item:
-            # nail the only optional attribute 
-            if 'Buy_Price' in item:
-                buy_price_flag = 1
-            else:
-                buy_price_flag = 0
-            # first up let's snag all these attributes
-            #start with the embedded ones
-            if key == 'Bids':
-                # if bids is 'None'
-                if item['Bids']is not None:
-                   for i,index in enumerate(item['Bids']):
-                       individualBidder = []
-                       for attr in list(index.values()):
-                           bEmbededAtr = attr['Bidder']
-                           for bidder in bEmbededAtr:
-                               #get this junk
-                               individualBidder.append((bidder, bEmbededAtr[bidder]))
-                           
-                           if 'Country' not in bEmbededAtr.keys():
-                               individualBidder.append(('Country', 'None'))
-                           if 'Location' not in bEmbededAtr.keys():
-                               individualBidder.append(('Location', 'None'))
-                               
-                           
-                           individualBidder.append(('Time', attr['Time']))
-                           individualBidder.append(('Amount', attr['Amount']))
-                       item_attributes.append(('bids' + str(i), individualBidder))
-                else:
-                    item_attributes.append(('bids', 'None'))
-                    pass
-            #next embedded one
-            elif key == 'Seller':
-                seller = item['Seller']
-                
-                item_attributes.append(('Seller UserID', seller['UserID'] ))
-                item_attributes.append(('Seller Rating', seller['Rating']))
-
-            else:
-                #rest of them attributes man
-                item_attributes.append((key, item[key]))
-            if buy_price_flag == 0:
-                item_attributes.append(('Buy_Price', 'None'))
-                    
-         # add them to their respective files and repeat
-        item_attributes = dict(item_attributes)
-        for key in item_attributes:
-            print(key, '\n', item_attributes[key], '\n')
-        #Seller
-        
-        with open('seller.dot', 'w') as  seller:
-            #gather attributes for seller
-            User_ID = item_attributes['Seller UserID']
-            Rating = item_attributes['Seller Rating']
-            Location = item_attributes['Location']
-            Country = item_attributes['Country']
-            Seller_Row = User_ID + '|' + Rating + '|' + Location + '|' + Country
-            seller.write(Seller_Row)
-        
-        with open('auction.dot', 'w') as auction:
-            Start = transformDttm(item_attributes['Started'])
-            End = transformDttm(item_attributes['Ends'])
-            First_bid = transformDollar(item_attributes['First_Bid'])
-            Currently = transformDollar(item_attributes['Currently'])
-            Number_of_Bids = item_attributes['Number_of_Bids']
-            Buy_Price = item_attributes['Buy_Price']
-            if Buy_Price != 'None':
-                Buy_Price = transformDollar(Buy_Price)
-            User_ID = item_attributes['Seller UserID']
-            Item_ID = item_attributes['ItemID']
-            Auction_row = Start + '|' + End + '|' + First_bid + '|' + Currently + '|' + Number_of_Bids + '|' + Buy_Price + '|' + User_ID + '|' + Item_ID
-            auction.write(Auction_row)         
-        
-        with open('item.dot', 'w') as item:
-            Name = item_attributes['Name']
-            Category = ''
-            for cats in item_attributes['Category']:
-                Category = Category + cats  + ', ' 
-            Category = Category[:-1 -1]
-            Description = item_attributes['Description']
-            Item_ID = item_attributes['ItemID']
-            item_row = Name + columnSeparator + Category + columnSeparator + Description + columnSeparator + Item_ID
-            item.write(item_row)
-                      
-                
-                
-            
-        
 
 """
 Loops through each json files provided on the command line and passes each file
