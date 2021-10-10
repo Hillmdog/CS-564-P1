@@ -90,6 +90,17 @@ def closeFiles():
     bidFile.close()
     bidderFile.close()
     
+def escapeStrings(string, outsideQuotes = True):
+    new_string = ''
+    for char in string:
+        if char == '"':
+            char = char + '"'
+        new_string = new_string + char
+    if outsideQuotes:
+        string = '"' + new_string + '"'
+    else:
+        string = new_string
+    return string
 """
 Parses a single json file. Currently, there's a loop that iterates over each
 item in the data set. Your job is to extend this functionality to create all
@@ -154,32 +165,34 @@ def parseJson(json_file):
             item_attributes = dict(item_attributes)
        
         
-            Seller_User_ID = item_attributes['Seller UserID']
+            Seller_User_ID = escapeStrings(item_attributes['Seller UserID'])
             Seller_Rating = item_attributes['Seller Rating']
-            Location = item_attributes['Location']
-            Country = item_attributes['Country']
-            Start = transformDttm(item_attributes['Started'])
-            End = transformDttm(item_attributes['Ends'])
-            First_bid = transformDollar(item_attributes['First_Bid'])
-            Currently = transformDollar(item_attributes['Currently'])
+            Location = escapeStrings(item_attributes['Location'])
+            Country = escapeStrings(item_attributes['Country'])
+            Start = escapeStrings(transformDttm(item_attributes['Started']))
+            End = escapeStrings(transformDttm(item_attributes['Ends']))
+            First_bid = escapeStrings(transformDollar(item_attributes['First_Bid']))
+            Currently = escapeStrings(transformDollar(item_attributes['Currently']))
             Number_of_Bids = item_attributes['Number_of_Bids']
             
             Buy_Price = item_attributes['Buy_Price']
             if Buy_Price != 'None':
-                Buy_Price = transformDollar(Buy_Price)
+                Buy_Price = escapeStrings(transformDollar(Buy_Price))
+            else:
+                Buy_Price = escapeStrings(Buy_Price)                
             
             Item_ID = item_attributes['ItemID']
-            Name = item_attributes['Name']
+            Name = escapeStrings(item_attributes['Name'])
             
-            Category = ''
+            Category = '"' 
             for cats in item_attributes['Category']:
-                Category = Category + cats  + ', ' 
-            Category = Category[:-1 -1]
+                Category = Category + escapeStrings(cats, outsideQuotes = False)  + ', ' 
+            Category = Category[:-1 -1] + '"'
            
             if item_attributes['Description'] is not None:
-                Description = item_attributes['Description']
+                Description = escapeStrings(item_attributes['Description'])
             else:
-                Description = 'None'
+                Description = '"None"'
             
             Bidder_UserID = None
             Bidder_Rating = None
@@ -189,25 +202,19 @@ def parseJson(json_file):
             Bidder_Amount = None
             for bids in item_attr_bids:
                 if 'None' not in bids:
-                    Bidder_UserID = bids['UserID']
-                    Bidder_Rating = bids['Rating']
-                    Bidder_Location = bids['Location']
-                    Bidder_Country = bids['Country']
-                    Bidder_Time = transformDttm(bids['Time'])
-                    Bidder_Amount = transformDollar(bids['Amount'])
-                else:
-                    Bidder_UserID = 'None'
-                    Bidder_Rating = 'None'
-                    Bidder_Location = 'None'
-                    Bidder_Country = 'None'
-                    Bidder_Time = 'None'
-                    Bidder_Amount = 'None'
-            #bid
-                bid_row = Bidder_Time + columnSeparator + Bidder_Amount + columnSeparator + Item_ID + columnSeparator + Bidder_UserID + '\n'
-                bidFile.write(bid_row)
-            #bidder
-                bidder_row = Bidder_Country + columnSeparator + Bidder_UserID +  columnSeparator + Bidder_Rating + columnSeparator + Bidder_Location + '\n' 
-                bidderFile.write(bidder_row)
+                    Bidder_UserID = escapeStrings(bids['UserID'])
+                    Bidder_Rating = bids['Rating'] 
+                    Bidder_Location = escapeStrings(bids['Location'])
+                    Bidder_Country = escapeStrings(bids['Country'])
+                    Bidder_Time = escapeStrings(transformDttm(bids['Time']))
+                    Bidder_Amount = escapeStrings(transformDollar(bids['Amount']))
+               
+                #bid
+                    bid_row = Bidder_Time + columnSeparator + Bidder_Amount + columnSeparator + Item_ID + columnSeparator + Bidder_UserID + '\n'
+                    bidFile.write(bid_row)
+                #bidder
+                    bidder_row = Bidder_Country + columnSeparator + Bidder_UserID +  columnSeparator + Bidder_Rating + columnSeparator + Bidder_Location + '\n' 
+                    bidderFile.write(bidder_row)
                 
             
             
