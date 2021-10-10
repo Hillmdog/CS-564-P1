@@ -1,0 +1,34 @@
+.separator |
+.import item.dat Item
+delete from Item where Item_ID = 'None';
+update Item set Name = null where Name = 'None';
+update Item set Category = null where Category = 'None';
+update Item set Description = null where Description = 'None';
+
+.import seller.dat Seller
+delete from Seller where User_ID = 'none';
+update Seller set Rating = null where Rating = 'none';
+delete from Seller where Location = 'none';
+delete from Seller where Country = 'none';
+
+.import Bidder.dat Bidder
+delete from Bidder where User_ID = 'None';
+update Seller set Rating = null where Rating = 'None';
+update Seller set Location = null where Location = 'None';
+update Seller set Country = null where Country = 'None';
+
+.import auction.dat Auction
+delete from Auction where Start = 'None';
+delete from Auction where End = 'None';
+delete from Auction where Seller_ID = 'None';
+delete from Auction where Item_ID = 'None';
+update Auction set First_Bid = null where First_Bid = 'None';
+update Auction set Currently = null where Currently = 'None';
+update Auction set Number_of_Bids = null where Number_of_Bids = 'None';
+update Auction set Buy_Price = null where Buy_Price = 'None';
+
+.import bid.dat Bid
+delete from Bid where Time = 'None';
+delete from Bid where Amount = 'None';
+delete from Bid where Item_ID = 'None';
+delete from Bid where Bidder_ID = 'None';
