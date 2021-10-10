@@ -189,33 +189,39 @@ def parseJson(json_file):
             else:
                 Description = '"None"'
                 
-            for cats in item_attributes['Category']:
-                Category = escapeStrings(cats)
-            #item  
-                item_row = Name + columnSeparator + Category + columnSeparator + Description + columnSeparator + Item_ID + '\n'
-                itemFile.write(item_row)
-            
             Bidder_UserID = None
             Bidder_Rating = None
             Bidder_Location = None
             Bidder_Country = None
             Bidder_Time = None
             Bidder_Amount = None
-            for bids in item_attr_bids:
-                if 'None' not in bids:
-                    Bidder_UserID = escapeStrings(bids['UserID'])
-                    Bidder_Rating = bids['Rating'] 
-                    Bidder_Location = escapeStrings(bids['Location'])
-                    Bidder_Country = escapeStrings(bids['Country'])
-                    Bidder_Time = escapeStrings(transformDttm(bids['Time']))
-                    Bidder_Amount = escapeStrings(transformDollar(bids['Amount']))
-               
-                #bid
-                    bid_row = Bidder_Time + columnSeparator + Bidder_Amount + columnSeparator + Item_ID + columnSeparator + Bidder_UserID + '\n'
-                    bidFile.write(bid_row)
-                #bidder
-                    bidder_row = Bidder_Country + columnSeparator + Bidder_UserID +  columnSeparator + Bidder_Rating + columnSeparator + Bidder_Location + '\n' 
-                    bidderFile.write(bidder_row)
+                
+            for cats in item_attributes['Category']:
+                Category = escapeStrings(cats)
+            #item  
+                item_row = Name + columnSeparator + Category + columnSeparator + Description + columnSeparator + Item_ID + '\n'
+                itemFile.write(item_row)
+            #auction  
+                Auction_row = Start + columnSeparator + End + columnSeparator + First_bid + columnSeparator + Currently + columnSeparator + Number_of_Bids + columnSeparator + Buy_Price + columnSeparator + Seller_User_ID + columnSeparator + Item_ID + columnSeparator + Category + '\n'
+                auctionFile.write(Auction_row)
+                for bids in item_attr_bids:
+                    if 'None' not in bids:
+                        Bidder_UserID = escapeStrings(bids['UserID'])
+                        Bidder_Rating = bids['Rating'] 
+                        Bidder_Location = escapeStrings(bids['Location'])
+                        Bidder_Country = escapeStrings(bids['Country'])
+                        Bidder_Time = escapeStrings(transformDttm(bids['Time']))
+                        Bidder_Amount = escapeStrings(transformDollar(bids['Amount']))
+                   
+                    #bid
+                        bid_row = Bidder_Time + columnSeparator + Bidder_Amount + columnSeparator + Item_ID + columnSeparator + Bidder_UserID + '\n'
+                        bidFile.write(bid_row)
+                    #bidder
+                        bidder_row = Bidder_Country + columnSeparator + Bidder_UserID +  columnSeparator + Bidder_Rating + columnSeparator + Bidder_Location + '\n' 
+                        bidderFile.write(bidder_row)
+            
+            
+            
                 
             
             
@@ -225,9 +231,7 @@ def parseJson(json_file):
             Seller_Row = Seller_User_ID + columnSeparator + Seller_Rating + columnSeparator + Location + columnSeparator + Country + '\n'
             sellerFile.write(Seller_Row)
         
-        #auction  
-            Auction_row = Start + columnSeparator + End + columnSeparator + First_bid + columnSeparator + Currently + columnSeparator + Number_of_Bids + columnSeparator + Buy_Price + columnSeparator + Seller_User_ID + columnSeparator + Item_ID + '\n'
-            auctionFile.write(Auction_row)         
+               
        
         
         
