@@ -35,21 +35,27 @@ create table Auction(
     Buy_Price REAL,
     Seller_ID TEXT,
     Item_ID INTEGER,
+    Category TEXT,
     FOREIGN KEY (Seller_ID)
         REFERENCES Seller(User_ID),
     FOREIGN KEY (Item_ID)
         REFERENCES Item(Item_ID),
-    PRIMARY KEY (Start, End, Seller_ID, Item_ID)
+    FOREIGN KEY (Category)
+        REFERENCES Item(Category),
+    PRIMARY KEY (Start, End, Seller_ID, Item_ID, Category)
 );
 
 create table Bid(
     Time DATE,
     Amount REAL,
-    Bidder_ID TEXT,
     Item_ID INTEGER,
+    Bidder_ID TEXT,
+    Category TEXT,
     FOREIGN KEY (Item_ID)
         REFERENCES Item(Item_ID),
     FOREIGN KEY (Bidder_ID)
         REFERENCES Bidder(User_ID),
-    PRIMARY KEY (Time, Amount, Item_ID, Bidder_ID)
+    FOREIGN KEY (Category)
+        REFERENCES Item(Category)
+    PRIMARY KEY (Time, Amount, Item_ID, Bidder_ID, Category)
 );

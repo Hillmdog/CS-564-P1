@@ -1,0 +1,6 @@
+SELECT COUNT(*)
+FROM (SELECT User_ID
+    FROM Seller
+    INTERSECT
+    SELECT User_ID
+    FROM Bidder);

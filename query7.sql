@@ -1,0 +1,4 @@
+SELECT COUNT(*)
+FROM (SELECT DISTINCT Category
+    FROM Bid
+    WHERE Amount > 100);

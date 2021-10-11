@@ -1,4 +1,5 @@
-SELECT COUNT(Category)
-FROM Auction
-    LEFT JOIN Item On Auction.Item_ID = Item.Item_ID
-WHERE Category LIKE '.%, %, %, %.';
+SELECT COUNT(*)
+FROM (SELECT Item_ID
+    FROM Auction
+    GROUP BY Item_ID
+    Having COUNT(Category) = 4);
